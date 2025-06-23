@@ -48,29 +48,40 @@
   <div class="container">
     <h2>Opening ShowBud App...</h2>
     <div class="loader"></div>
-    <p class="message">If the app doesn't open automatically, <a id="fallback" class="fallback-link" href="#">click here</a> to open it in the Play Store.</p>
+    <p class="message">If the app doesn't open, <a id="fallback" class="fallback-link" href="#">click here</a> to open it in the Play Store.</p>
   </div>
 
   <script>
     (function() {
+      const appScheme = "showbud://"; // Your app's custom URL scheme
       const playStoreUrl = "https://play.google.com/store/apps/details?id=com.mycompany.showbud";
-      const appUrl = "showbud://"; // Custom URL scheme your app should handle
+      const intentUrl = "intent://#Intent;package=com.mycompany.showbud;end;";
 
-      // Fallback link leads to Play Store
       document.getElementById('fallback').href = playStoreUrl;
 
-      // Try opening the app
-      const timeout = setTimeout(() => {
-        window.location.href = playStoreUrl; // Redirect to Play Store if app not opened
-      }, 2000); // 2 seconds timeout
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
 
-      // Attempt to open the app via custom scheme
-      window.location.href = appUrl;
+      if (/android/i.test(ua)) {
+        // Try to open via intent on Android
+        window.location.href = intentUrl;
 
-      // Clear the timeout if page is hidden (means app opened)
+        setTimeout(() => {
+          window.location.href = playStoreUrl;
+        }, 2000); // If fail, fallback to Play Store
+      } else if (/iPad|iPhone|iPod/.test(ua) && !window.MSStream) {
+        // For iOS devices (example — you can set your App Store link here if needed)
+        window.location.href = appScheme;
+        setTimeout(() => {
+          window.location.href = playStoreUrl; // Optional: link to iOS store
+        }, 2000);
+      } else {
+        // For other devices/desktops
+        document.querySelector('.message').innerHTML = 'Please open this page on your mobile device to launch the app.';
+      }
+
       document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
-          clearTimeout(timeout);
+          clearTimeout();
         }
       });
     })();
