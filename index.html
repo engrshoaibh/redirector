@@ -2,21 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0">
-  <title>Redirecting...</title>
-  <script>
-    (function () {
-      const params = new URLSearchParams(window.location.search);
-      const redirectUrl = params.get("redirect");
-
-      if (redirectUrl) {
-        window.location.href = redirectUrl;
-      } else {
-        document.write("<h1>No redirect URL provided.</h1>");
-      }
-    })();
-  </script>
+  <title>Redirecting to ShowBud...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f9f9f9;
+      font-family: Arial, sans-serif;
+      color: #333;
+      text-align: center;
+    }
+    .container {
+      max-width: 300px;
+    }
+    .loader {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    .fallback-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #3498db;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h2>Opening ShowBud App...</h2>
+    <div class="loader"></div>
+    <p class="message">If the app doesn't open automatically, <a id="fallback" class="fallback-link" href="#">click here</a> to open it in the Play Store.</p>
+  </div>
+
+  <script>
+    (function() {
+      const playStoreUrl = "https://play.google.com/store/apps/details?id=com.mycompany.showbud";
+      const appUrl = "showbud://"; // Custom URL scheme your app should handle
+
+      // Fallback link leads to Play Store
+      document.getElementById('fallback').href = playStoreUrl;
+
+      // Try opening the app
+      const timeout = setTimeout(() => {
+        window.location.href = playStoreUrl; // Redirect to Play Store if app not opened
+      }, 2000); // 2 seconds timeout
+
+      // Attempt to open the app via custom scheme
+      window.location.href = appUrl;
+
+      // Clear the timeout if page is hidden (means app opened)
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          clearTimeout(timeout);
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
